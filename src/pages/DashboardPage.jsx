@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import SignupPrompt from "../components/SignupPrompt";
+import { useAuth } from "../context/AuthContext";
 
 const games = [
   {
@@ -47,17 +49,24 @@ const games = [
 ];
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+
   return (
     <div className="app-shell min-h-screen">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="mb-10 text-center sm:text-left">
+        <div className="mb-6 text-center sm:text-left">
           <p className="text-indigo-200 text-sm font-semibold uppercase tracking-widest mb-2">Your arcade</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Choose a puzzle</h1>
           <p className="mt-2 text-indigo-100/80 max-w-xl">
-            Pick a game below. Progress and high scores sync to your profile automatically.
+            Pick a game below.{" "}
+            {user
+              ? "Progress and high scores sync to your profile automatically."
+              : "Play as a guest, or sign up to save your progress and sync it across devices."}
           </p>
         </div>
+
+        {!user && <SignupPrompt />}
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {games.map((game) => (

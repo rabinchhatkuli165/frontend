@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
-import api from "../api";
+import SignupPrompt from "../components/SignupPrompt";
+import { useGuestSave } from "../hooks/useGuestSave";
 
 const ROWS = 9;
 const COLS = 9;
@@ -76,6 +77,7 @@ export default function MinesweeperPage() {
   const [boom, setBoom] = useState(false);
   const [won, setWon] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const { saveStats, isGuest } = useGuestSave();
 
   useEffect(() => {
     if (phase !== "play" || boom || won) return undefined;
@@ -134,7 +136,7 @@ export default function MinesweeperPage() {
         if (checkWin(next, im)) {
           setWon(true);
           const finalScore = Math.max(0, 1200 - seconds * 8 - Math.abs(flaggedCount - MINES) * 25);
-          api.put("/auth/profile/stats", { game: "minesweeper", highScore: finalScore, progress: 100 });
+          saveStats({ game: "minesweeper", highScore: finalScore, progress: 100 });
         }
         return next;
       });
@@ -149,7 +151,7 @@ export default function MinesweeperPage() {
         for (let i = 0; i < ROWS; i++) for (let j = 0; j < COLS; j++) if (isMine(i, j)) next[i][j] = true;
         return next;
       });
-      api.put("/auth/profile/stats", { game: "minesweeper", highScore: 100, progress: 20 });
+      saveStats({ game: "minesweeper", highScore: 100, progress: 20 });
       return;
     }
 
@@ -159,7 +161,7 @@ export default function MinesweeperPage() {
       if (checkWin(next, isMine)) {
         setWon(true);
         const finalScore = Math.max(0, 1200 - seconds * 8 - Math.abs(flaggedCount - MINES) * 25);
-        api.put("/auth/profile/stats", { game: "minesweeper", highScore: finalScore, progress: 100 });
+        saveStats({ game: "minesweeper", highScore: finalScore, progress: 100 });
       }
       return next;
     });
@@ -173,6 +175,9 @@ export default function MinesweeperPage() {
           title="Minesweeper"
           subtitle="Clear the board quickly and flag accurately for a better final score."
         />
+
+        {isGuest && <SignupPrompt />}
+
         <div className="card-elevated p-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             <div className="rounded-xl bg-slate-100 p-3">

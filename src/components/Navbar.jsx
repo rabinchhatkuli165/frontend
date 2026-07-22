@@ -26,17 +26,28 @@ export default function Navbar() {
           <Link className="text-indigo-100 hover:text-white transition" to="/dashboard">
             Dashboard
           </Link>
-          <Link className="text-indigo-100 hover:text-white transition" to="/profile">
-            Profile
-          </Link>
-          {user && (
-            <span className="text-indigo-200/90 hidden sm:inline">
-              Hi, <span className="font-semibold text-white">{user.username}</span>
-            </span>
+          {user ? (
+            <>
+              <Link className="text-indigo-100 hover:text-white transition" to="/profile">
+                Profile
+              </Link>
+              <span className="text-indigo-200/90 hidden sm:inline">
+                Hi, <span className="font-semibold text-white">{user.username}</span>
+              </span>
+              <button type="button" className="btn-secondary" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="text-indigo-100 hover:text-white transition" to="/login">
+                Login
+              </Link>
+              <Link className="btn-secondary" to="/signup">
+                Sign up
+              </Link>
+            </>
           )}
-          <button type="button" className="btn-secondary" onClick={handleLogout}>
-            Logout
-          </button>
         </div>
       </div>
     </nav>

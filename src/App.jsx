@@ -12,7 +12,6 @@ import ReactionTimePage from "./pages/ReactionTimePage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -23,70 +22,18 @@ export default function App() {
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/games/memory-match"
-        element={
-          <ProtectedRoute>
-            <MemoryMatchPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/games/sudoku"
-        element={
-          <ProtectedRoute>
-            <SudokuPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/games/word-search"
-        element={
-          <ProtectedRoute>
-            <WordSearchPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/games/2048"
-        element={
-          <ProtectedRoute>
-            <Game2048Page />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/games/minesweeper"
-        element={
-          <ProtectedRoute>
-            <MinesweeperPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/games/reaction"
-        element={
-          <ProtectedRoute>
-            <ReactionTimePage />
-          </ProtectedRoute>
-        }
-      />
+
+      {/* Public: guests can browse the dashboard and see a limited profile preview */}
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+
+      {/* Public: guests can play every game; progress is saved locally until they sign up */}
+      <Route path="/games/memory-match" element={<MemoryMatchPage />} />
+      <Route path="/games/sudoku" element={<SudokuPage />} />
+      <Route path="/games/word-search" element={<WordSearchPage />} />
+      <Route path="/games/2048" element={<Game2048Page />} />
+      <Route path="/games/minesweeper" element={<MinesweeperPage />} />
+      <Route path="/games/reaction" element={<ReactionTimePage />} />
     </Routes>
   );
 }

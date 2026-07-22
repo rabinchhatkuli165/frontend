@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
-import api from "../api";
+import SignupPrompt from "../components/SignupPrompt";
+import { useGuestSave } from "../hooks/useGuestSave";
 
 const grid = [
   ["R", "E", "A", "C", "T", "Q", "L", "M"],
@@ -20,6 +21,7 @@ export default function WordSearchPage() {
   const [entry, setEntry] = useState("");
   const [found, setFound] = useState([]);
   const [message, setMessage] = useState("");
+  const { saveStats, isGuest } = useGuestSave();
 
   const completed = useMemo(() => found.length === words.length, [found.length]);
 
@@ -40,13 +42,13 @@ export default function WordSearchPage() {
     setMessage(`Found ${value}!`);
 
     if (nextFound.length === words.length) {
-      await api.put("/auth/profile/stats", {
+      await saveStats({
         game: "wordSearch",
         highScore: nextFound.length * 100,
         progress: 100
       });
     } else {
-      await api.put("/auth/profile/stats", {
+      await saveStats({
         game: "wordSearch",
         progress: Math.round((nextFound.length / words.length) * 100)
       });
@@ -61,6 +63,8 @@ export default function WordSearchPage() {
           title="Word Search"
           subtitle="Words can appear horizontally in any row. Type a word from the list when you spot it."
         />
+
+        {isGuest && <SignupPrompt />}
 
         <div className="card-elevated p-6 sm:p-8 overflow-x-auto">
           <div className="inline-grid grid-cols-8 gap-1 bg-gradient-to-br from-teal-600 to-emerald-700 p-3 rounded-2xl shadow-inner">

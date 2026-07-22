@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
-import api from "../api";
+import SignupPrompt from "../components/SignupPrompt";
+import { useGuestSave } from "../hooks/useGuestSave";
 
 const puzzle = [
   [5, 3, 0, 0, 7, 0, 0, 0, 0],
@@ -31,16 +32,17 @@ export default function SudokuPage() {
   const [grid, setGrid] = useState(puzzle.map((row) => [...row]));
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState(0);
+  const { saveStats, isGuest } = useGuestSave();
 
   const complete = useMemo(() => JSON.stringify(grid) === JSON.stringify(solution), [grid]);
 
   useEffect(() => {
     if (complete) {
       const score = Math.max(0, 1000 - errors * 50);
-      api.put("/auth/profile/stats", { game: "sudoku", highScore: score, progress: 100 });
+      saveStats({ game: "sudoku", highScore: score, progress: 100 });
       setMessage("Sudoku solved!");
     }
-  }, [complete, errors]);
+  }, [complete, errors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateCell = (r, c, value) => {
     if (puzzle[r][c] !== 0) return;
@@ -78,6 +80,8 @@ export default function SudokuPage() {
           title="Sudoku"
           subtitle="Complete the grid. Clues are locked; wrong entries count against your score."
         />
+
+        {isGuest && <SignupPrompt />}
 
         <div className="card-elevated p-6 sm:p-8 overflow-x-auto">
           <p className="text-slate-600 mb-4">

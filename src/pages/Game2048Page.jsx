@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
-import api from "../api";
+import SignupPrompt from "../components/SignupPrompt";
+import { useGuestSave } from "../hooks/useGuestSave";
 
 const N = 4;
 
@@ -93,16 +94,17 @@ export default function Game2048Page() {
   const [grid, setGrid] = useState(() => addTile(addTile(empty())));
   const [score, setScore] = useState(0);
   const [over, setOver] = useState(false);
+  const { saveStats, isGuest } = useGuestSave();
 
   useEffect(() => {
     if (!over) return;
     const max = maxTile(grid);
-    api.put("/auth/profile/stats", {
+    saveStats({
       game: "game2048",
       highScore: score + max * 5,
       progress: max >= 2048 ? 100 : Math.min(99, Math.floor((Math.log2(Math.max(max, 2)) / 11) * 100))
     });
-  }, [over, grid, score]);
+  }, [over, grid, score]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tryMove = useCallback(
     (dir) => {
@@ -152,6 +154,9 @@ export default function Game2048Page() {
           title="2048"
           subtitle="Arrow keys: merge matching numbers. Reach 2048 or fill the board with no moves."
         />
+
+        {isGuest && <SignupPrompt />}
+
         <div className="card-elevated p-6">
           <div className="flex justify-between items-center mb-4">
             <p className="text-slate-600">

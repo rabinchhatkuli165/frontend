@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
-import api from "../api";
+import SignupPrompt from "../components/SignupPrompt";
+import { useGuestSave } from "../hooks/useGuestSave";
 
 export default function ReactionTimePage() {
   const [phase, setPhase] = useState("idle");
@@ -12,6 +13,7 @@ export default function ReactionTimePage() {
   const [message, setMessage] = useState("Tap to start your first round.");
   const startAt = useRef(0);
   const timer = useRef(null);
+  const { saveStats, isGuest } = useGuestSave();
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
@@ -45,7 +47,7 @@ export default function ReactionTimePage() {
       setRounds((prev) => [t, ...prev].slice(0, 5));
       setStreak((prev) => (t < 280 ? prev + 1 : 0));
       setMessage(t < 220 ? "Lightning fast!" : t < 300 ? "Nice reaction." : "Good try, go faster.");
-      api.put("/auth/profile/stats", {
+      saveStats({
         game: "reactionTap",
         highScore: score,
         bestTime: t,
@@ -73,6 +75,9 @@ export default function ReactionTimePage() {
           title="Reaction time"
           subtitle="Tap as soon as the panel turns green. Build a streak of fast rounds to stay sharp."
         />
+
+        {isGuest && <SignupPrompt />}
+
         <div className="card-elevated p-6 space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="rounded-xl bg-slate-100 p-3">

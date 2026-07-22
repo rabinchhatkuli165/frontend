@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import PageHeader from "../components/PageHeader";
-import api from "../api";
+import SignupPrompt from "../components/SignupPrompt";
+import { useGuestSave } from "../hooks/useGuestSave";
 
 const symbols = ["A", "A", "B", "B", "C", "C", "D", "D", "E", "E", "F", "F"];
 
@@ -18,6 +19,7 @@ export default function MemoryMatchPage() {
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
   const [message, setMessage] = useState("Find your first pair!");
+  const { saveStats, isGuest } = useGuestSave();
 
   useEffect(() => {
     setDeck(shuffle(symbols));
@@ -62,8 +64,8 @@ export default function MemoryMatchPage() {
     if (!completed) return;
     const score = liveScore;
     setMessage(`Board complete in ${moves} moves and ${elapsedSeconds}s.`);
-    api.put("/auth/profile/stats", { game: "memoryMatch", highScore: score, progress: 100 });
-  }, [completed, moves, elapsedSeconds, liveScore]);
+    saveStats({ game: "memoryMatch", highScore: score, progress: 100 });
+  }, [completed, moves, elapsedSeconds, liveScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const reveal = (index) => {
     if (selected.includes(index) || matched.includes(index) || selected.length === 2) return;
@@ -89,6 +91,8 @@ export default function MemoryMatchPage() {
           title="Memory Match"
           subtitle="Build streaks for bonus points. Faster clears and fewer moves produce higher scores."
         />
+
+        {isGuest && <SignupPrompt />}
 
         <div className="card-elevated p-6 sm:p-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
