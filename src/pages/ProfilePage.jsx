@@ -10,7 +10,8 @@ const GAME_META = {
   wordSearch: { label: "Word Search", emoji: "🔤" },
   game2048: { label: "2048", emoji: "🔢" },
   minesweeper: { label: "Minesweeper", emoji: "💣" },
-  reactionTap: { label: "Reaction", emoji: "⚡" }
+  reactionTap: { label: "Reaction", emoji: "⚡" },
+  snake: { label: "Snake", emoji: "🐍" }
 };
 
 function statsToEntries(gameStats) {

@@ -45,6 +45,13 @@ const games = [
     description: "Tap when the screen turns green — lower ms is better.",
     icon: "⚡",
     accent: "from-lime-500 to-green-600"
+  },
+  {
+    key: "snake",
+    title: "Snake",
+    description: "Grow your snake and dodge the walls — every bite counts.",
+    icon: "🐍",
+    accent: "from-green-500 to-emerald-700"
   }
 ];
 

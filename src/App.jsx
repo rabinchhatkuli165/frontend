@@ -9,6 +9,7 @@ import WordSearchPage from "./pages/WordSearchPage";
 import Game2048Page from "./pages/Game2048Page";
 import MinesweeperPage from "./pages/MinesweeperPage";
 import ReactionTimePage from "./pages/ReactionTimePage";
+import SnakePage from "./pages/SnakePage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/games/2048" element={<Game2048Page />} />
       <Route path="/games/minesweeper" element={<MinesweeperPage />} />
       <Route path="/games/reaction" element={<ReactionTimePage />} />
+      <Route path="/games/snake" element={<SnakePage />} />
     </Routes>
   );
 }
