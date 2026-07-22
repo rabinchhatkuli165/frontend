@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import GameShell from "../components/cyber/GameShell";
+import CyberPageHeader from "../components/cyber/CyberPageHeader";
+import CyberPanel from "../components/cyber/CyberPanel";
+import CyberStat, { CyberStatGrid } from "../components/cyber/CyberStat";
 import SignupPrompt from "../components/SignupPrompt";
 import { useGuestSave } from "../hooks/useGuestSave";
 
@@ -66,35 +68,40 @@ export default function SudokuPage() {
     }
   };
 
-  const thickBorder = (r, c) => {
-    const br = r === 2 || r === 5 ? "border-b-2 border-slate-400" : "";
-    const bc = c === 2 || c === 5 ? "border-r-2 border-slate-400" : "";
-    return `${br} ${bc}`;
+  const cellClass = (r, c) => {
+    const parts = ["cyber-sudoku-cell"];
+    if (puzzle[r][c]) parts.push("is-clue");
+    else if (grid[r][c] && grid[r][c] !== solution[r][c]) parts.push("is-error");
+    if (r === 2 || r === 5) parts.push("thick-b");
+    if (c === 2 || c === 5) parts.push("thick-r");
+    return parts.join(" ");
   };
 
+  const score = Math.max(0, 1000 - errors * 50);
+
   return (
-    <div className="app-shell min-h-screen">
-      <Navbar />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <PageHeader
-          title="Sudoku"
-          subtitle="Complete the grid. Clues are locked; wrong entries count against your score."
-        />
+    <GameShell accent="blue" maxWidth="lg">
+      <CyberPageHeader
+        title="Sudoku"
+        subtitle="Complete the grid. Clues are locked; wrong entries count against your score."
+        tag="LOGIC"
+      />
 
-        {isGuest && <SignupPrompt />}
+      {isGuest && <SignupPrompt variant="cyber" />}
 
-        <div className="card-elevated p-6 sm:p-8 overflow-x-auto">
-          <p className="text-slate-600 mb-4">
-            Incorrect entries: <span className="font-bold text-slate-900">{errors}</span>
-          </p>
-          <div className="inline-grid grid-cols-9 gap-0 bg-slate-800 p-2 rounded-xl shadow-inner">
+      <CyberPanel>
+        <CyberStatGrid>
+          <CyberStat label="Errors" value={errors} delay={0} />
+          <CyberStat label="Live score" value={score} highlight delay={50} />
+        </CyberStatGrid>
+
+        <div className="cyber-sudoku-wrap">
+          <div className="cyber-sudoku-grid">
             {grid.map((row, r) =>
               row.map((cell, c) => (
                 <input
                   key={`${r}-${c}`}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 text-center text-sm sm:text-base font-semibold border border-slate-300 outline-none focus:ring-2 focus:ring-indigo-400 focus:z-10 ${thickBorder(r, c)} ${
-                    puzzle[r][c] ? "bg-slate-200 text-slate-900 cursor-not-allowed" : "bg-white text-indigo-900"
-                  }`}
+                  className={cellClass(r, c)}
                   value={cell === 0 ? "" : cell}
                   onChange={(e) => updateCell(r, c, e.target.value)}
                   disabled={puzzle[r][c] !== 0}
@@ -103,9 +110,10 @@ export default function SudokuPage() {
               ))
             )}
           </div>
-          {message && <p className="mt-6 text-emerald-700 font-semibold">{message}</p>}
         </div>
-      </main>
-    </div>
+
+        {message && <p className="cyber-msg cyber-msg--success">{message}</p>}
+      </CyberPanel>
+    </GameShell>
   );
 }

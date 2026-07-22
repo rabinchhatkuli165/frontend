@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import GameShell from "../components/cyber/GameShell";
+import CyberPageHeader from "../components/cyber/CyberPageHeader";
+import CyberPanel from "../components/cyber/CyberPanel";
+import CyberButton from "../components/cyber/CyberButton";
+import CyberStat, { CyberStatGrid } from "../components/cyber/CyberStat";
 import SignupPrompt from "../components/SignupPrompt";
 import { useGuestSave } from "../hooks/useGuestSave";
 
@@ -139,47 +142,48 @@ export default function Game2048Page() {
     setOver(false);
   };
 
-  const cellBg = (v) => {
-    if (v === 0) return "bg-slate-200/90";
-    if (v < 8) return "bg-amber-100 text-amber-900";
-    if (v < 128) return "bg-orange-200 text-orange-950";
-    return "bg-rose-400 text-white";
-  };
+  const maxVal = maxTile(grid);
 
   return (
-    <div className="app-shell min-h-screen">
-      <Navbar />
-      <main className="max-w-lg mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <PageHeader
-          title="2048"
-          subtitle="Arrow keys: merge matching numbers. Reach 2048 or fill the board with no moves."
-        />
+    <GameShell accent="amber" maxWidth="md">
+      <CyberPageHeader
+        title="2048"
+        subtitle="Arrow keys: merge matching numbers. Reach 2048 or fill the board with no moves."
+        tag="ARCADE"
+      />
 
-        {isGuest && <SignupPrompt />}
+      {isGuest && <SignupPrompt variant="cyber" />}
 
-        <div className="card-elevated p-6">
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-slate-600">
-              Score: <span className="font-bold text-slate-900">{score}</span>
-            </p>
-            <button type="button" onClick={restart} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm font-semibold">
-              New game
-            </button>
-          </div>
-          <div className="grid grid-cols-4 gap-2 bg-slate-800 p-3 rounded-2xl">
-            {grid.flat().map((v, i) => (
-              <div
-                key={i}
-                className={`aspect-square flex items-center justify-center rounded-xl text-lg sm:text-2xl font-bold ${cellBg(v)}`}
-              >
-                {v || ""}
-              </div>
-            ))}
-          </div>
-          {over && <p className="mt-4 text-rose-700 font-semibold">Game over — no moves left.</p>}
-          <p className="mt-4 text-xs text-slate-500">Use keyboard arrows (↑ ↓ ← →).</p>
+      <CyberPanel>
+        <CyberStatGrid>
+          <CyberStat label="Score" value={score} highlight delay={0} />
+          <CyberStat label="Best tile" value={maxVal || "—"} delay={50} />
+        </CyberStatGrid>
+
+        <div className="cyber-toolbar">
+          <p className="cyber-toolbar-status">
+            {over ? "No moves left." : "Use arrow keys to slide tiles."}
+          </p>
+          <CyberButton variant="primary" onClick={restart}>
+            New game
+          </CyberButton>
         </div>
-      </main>
-    </div>
+
+        <div className="cyber-2048-board">
+          {grid.flat().map((v, i) => (
+            <div
+              key={i}
+              className={`cyber-2048-tile${v === 0 ? " is-empty" : ""}`}
+              data-value={v || undefined}
+            >
+              {v || ""}
+            </div>
+          ))}
+        </div>
+
+        {over && <p className="cyber-msg cyber-msg--error">Game over — no moves left.</p>}
+        <p className="cyber-hint">Use keyboard arrows (↑ ↓ ← →)</p>
+      </CyberPanel>
+    </GameShell>
   );
 }

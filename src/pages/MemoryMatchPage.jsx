@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import GameShell from "../components/cyber/GameShell";
+import CyberPageHeader from "../components/cyber/CyberPageHeader";
+import CyberPanel from "../components/cyber/CyberPanel";
+import CyberButton from "../components/cyber/CyberButton";
+import CyberStat, { CyberStatGrid } from "../components/cyber/CyberStat";
 import SignupPrompt from "../components/SignupPrompt";
 import { useGuestSave } from "../hooks/useGuestSave";
 
@@ -62,9 +65,8 @@ export default function MemoryMatchPage() {
 
   useEffect(() => {
     if (!completed) return;
-    const score = liveScore;
     setMessage(`Board complete in ${moves} moves and ${elapsedSeconds}s.`);
-    saveStats({ game: "memoryMatch", highScore: score, progress: 100 });
+    saveStats({ game: "memoryMatch", highScore: liveScore, progress: 100 });
   }, [completed, moves, elapsedSeconds, liveScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const reveal = (index) => {
@@ -84,77 +86,56 @@ export default function MemoryMatchPage() {
   };
 
   return (
-    <div className="app-shell min-h-screen">
-      <Navbar />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <PageHeader
-          title="Memory Match"
-          subtitle="Build streaks for bonus points. Faster clears and fewer moves produce higher scores."
-        />
+    <GameShell accent="violet" maxWidth="lg">
+      <CyberPageHeader
+        title="Memory Match"
+        subtitle="Build streaks for bonus points. Faster clears and fewer moves produce higher scores."
+        tag="PUZZLE"
+      />
 
-        {isGuest && <SignupPrompt />}
+      {isGuest && <SignupPrompt variant="cyber" />}
 
-        <div className="card-elevated p-6 sm:p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-            <div className="rounded-xl bg-slate-100 p-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Moves</p>
-              <p className="text-xl font-bold text-slate-900">{moves}</p>
-            </div>
-            <div className="rounded-xl bg-slate-100 p-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Time</p>
-              <p className="text-xl font-bold text-slate-900">{elapsedSeconds}s</p>
-            </div>
-            <div className="rounded-xl bg-indigo-50 p-3">
-              <p className="text-xs text-indigo-600 uppercase tracking-wide">Best combo</p>
-              <p className="text-xl font-bold text-indigo-700">{bestCombo}x</p>
-            </div>
-            <div className="rounded-xl bg-emerald-50 p-3">
-              <p className="text-xs text-emerald-600 uppercase tracking-wide">Live score</p>
-              <p className="text-xl font-bold text-emerald-700">{liveScore}</p>
-            </div>
-          </div>
+      <CyberPanel>
+        <CyberStatGrid>
+          <CyberStat label="Moves" value={moves} delay={0} />
+          <CyberStat label="Time" value={`${elapsedSeconds}s`} delay={50} />
+          <CyberStat label="Best combo" value={`${bestCombo}x`} highlight delay={100} />
+          <CyberStat label="Live score" value={liveScore} highlight delay={150} />
+        </CyberStatGrid>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <p className="text-sm text-slate-600">
-              Current streak: <span className="font-semibold text-slate-900">{combo}x</span>
-            </p>
-            <button
-              type="button"
-              className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm font-semibold hover:bg-slate-800 transition"
-              onClick={restart}
-            >
-              Shuffle & restart
-            </button>
-          </div>
-
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-            {deck.map((card, index) => {
-              const isRevealed = selected.includes(index) || matched.includes(index);
-              return (
-                <button
-                  type="button"
-                  key={`${card}-${index}`}
-                  className={`h-20 sm:h-24 rounded-2xl text-xl font-bold shadow-inner transition transform active:scale-95 ${
-                    isRevealed
-                      ? "bg-gradient-to-br from-indigo-500 to-violet-600 text-white"
-                      : "bg-slate-200 text-slate-500 hover:bg-slate-300"
-                  }`}
-                  onClick={() => reveal(index)}
-                >
-                  {isRevealed ? card : "?"}
-                </button>
-              );
-            })}
-          </div>
-
-          {completed && (
-            <p className="mt-6 text-emerald-700 font-semibold flex items-center gap-2">
-              <span aria-hidden>✓</span> Great! All pairs matched. Final score: {liveScore}
-            </p>
-          )}
-          {message && <p className="mt-2 text-sm text-slate-600">{message}</p>}
+        <div className="cyber-toolbar">
+          <p className="cyber-toolbar-status">
+            Current streak: <strong style={{ color: "var(--cyber-accent)" }}>{combo}x</strong>
+          </p>
+          <CyberButton variant="primary" onClick={restart}>
+            Shuffle & restart
+          </CyberButton>
         </div>
-      </main>
-    </div>
+
+        <div className="cyber-memory-grid">
+          {deck.map((card, index) => {
+            const isRevealed = selected.includes(index) || matched.includes(index);
+            const isMatched = matched.includes(index);
+            return (
+              <button
+                type="button"
+                key={`${card}-${index}`}
+                className={`cyber-memory-card${isRevealed ? " is-revealed" : ""}${isMatched ? " is-matched" : ""}`}
+                onClick={() => reveal(index)}
+              >
+                {isRevealed ? card : "?"}
+              </button>
+            );
+          })}
+        </div>
+
+        {completed && (
+          <p className="cyber-msg cyber-msg--success">
+            ✓ Great! All pairs matched. Final score: {liveScore}
+          </p>
+        )}
+        {message && !completed && <p className="cyber-msg">{message}</p>}
+      </CyberPanel>
+    </GameShell>
   );
 }

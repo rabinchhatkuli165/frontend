@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import GameShell from "../components/cyber/GameShell";
+import CyberPageHeader from "../components/cyber/CyberPageHeader";
+import CyberPanel from "../components/cyber/CyberPanel";
+import CyberStat, { CyberStatGrid } from "../components/cyber/CyberStat";
 import SignupPrompt from "../components/SignupPrompt";
 import { useGuestSave } from "../hooks/useGuestSave";
 
@@ -60,71 +62,53 @@ export default function ReactionTimePage() {
     }
   };
 
-  const bg =
+  const padClass =
     phase === "go"
-      ? "bg-emerald-500"
+      ? "is-go"
       : phase === "wait"
-        ? "bg-rose-400"
-        : "bg-slate-700";
+        ? "is-wait"
+        : phase === "result"
+          ? "is-result"
+          : "is-idle";
 
   return (
-    <div className="app-shell min-h-screen">
-      <Navbar />
-      <main className="max-w-lg mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <PageHeader
-          title="Reaction time"
-          subtitle="Tap as soon as the panel turns green. Build a streak of fast rounds to stay sharp."
-        />
+    <GameShell accent="lime" maxWidth="md">
+      <CyberPageHeader
+        title="Reaction Time"
+        subtitle="Tap as soon as the panel turns green. Build a streak of fast rounds to stay sharp."
+        tag="REFLEX"
+      />
 
-        {isGuest && <SignupPrompt />}
+      {isGuest && <SignupPrompt variant="cyber" />}
 
-        <div className="card-elevated p-6 space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl bg-slate-100 p-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Best</p>
-              <p className="text-lg font-bold text-slate-900">{best ?? "--"}{best != null ? " ms" : ""}</p>
-            </div>
-            <div className="rounded-xl bg-indigo-50 p-3">
-              <p className="text-xs text-indigo-600 uppercase tracking-wide">Streak</p>
-              <p className="text-lg font-bold text-indigo-700">{streak}</p>
-            </div>
-            <div className="rounded-xl bg-emerald-50 p-3">
-              <p className="text-xs text-emerald-600 uppercase tracking-wide">Last</p>
-              <p className="text-lg font-bold text-emerald-700">{ms != null && ms >= 0 ? `${ms} ms` : "--"}</p>
-            </div>
-            <div className="rounded-xl bg-amber-50 p-3">
-              <p className="text-xs text-amber-600 uppercase tracking-wide">Rounds</p>
-              <p className="text-lg font-bold text-amber-700">{rounds.length}</p>
-            </div>
-          </div>
+      <CyberPanel>
+        <CyberStatGrid>
+          <CyberStat label="Best" value={best != null ? `${best} ms` : "—"} highlight delay={0} />
+          <CyberStat label="Streak" value={streak} delay={50} />
+          <CyberStat label="Last" value={ms != null && ms >= 0 ? `${ms} ms` : "—"} delay={100} />
+          <CyberStat label="Rounds" value={rounds.length} delay={150} />
+        </CyberStatGrid>
 
-          <button
-            type="button"
-            onClick={tap}
-            className={`w-full rounded-2xl py-24 sm:py-32 text-white text-xl font-bold transition-colors ${bg} shadow-inner`}
-          >
-            {phase === "idle" && "Tap to start"}
-            {phase === "wait" && "Wait for green…"}
-            {phase === "go" && "Tap now!"}
-            {phase === "result" && ms != null && ms >= 0 && `${ms} ms`}
-            {phase === "result" && ms === -1 && "Too early!"}
-          </button>
-          {best != null && ms != null && ms >= 0 && (
-            <p className="text-center text-slate-600">
-              Best this session: <span className="font-bold text-slate-900">{best} ms</span>
-            </p>
-          )}
-          <p className="text-center text-sm text-slate-600">{message}</p>
-          {rounds.length > 1 && (
-            <p className="text-center text-xs text-slate-500">
-              Last {rounds.length} avg: {Math.round(rounds.reduce((a, b) => a + b, 0) / rounds.length)} ms
-            </p>
-          )}
-          <p className="text-xs text-slate-500 text-center">
-            Score sent as higher = faster reaction (10000 − milliseconds).
+        <button type="button" onClick={tap} className={`cyber-reaction-pad ${padClass}`}>
+          {phase === "idle" && "Tap to start"}
+          {phase === "wait" && "Wait for green…"}
+          {phase === "go" && "Tap now!"}
+          {phase === "result" && ms != null && ms >= 0 && `${ms} ms`}
+          {phase === "result" && ms === -1 && "Too early!"}
+        </button>
+
+        {best != null && ms != null && ms >= 0 && (
+          <p className="cyber-msg" style={{ textAlign: "center" }}>
+            Best this session: <strong style={{ color: "var(--cyber-accent)" }}>{best} ms</strong>
           </p>
-        </div>
-      </main>
-    </div>
+        )}
+        <p className="cyber-msg" style={{ textAlign: "center" }}>{message}</p>
+        {rounds.length > 1 && (
+          <p className="cyber-hint">
+            Last {rounds.length} avg: {Math.round(rounds.reduce((a, b) => a + b, 0) / rounds.length)} ms
+          </p>
+        )}
+      </CyberPanel>
+    </GameShell>
   );
 }

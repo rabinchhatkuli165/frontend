@@ -1,15 +1,42 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function SignupPrompt({ message, dismissible = true }) {
+export default function SignupPrompt({ message, dismissible = true, variant = "default" }) {
   const [dismissed, setDismissed] = useState(false);
   if (dismissed) return null;
 
+  const text =
+    message || "You're playing as a guest. Sign up to save your progress and sync it across devices.";
+
+  if (variant === "cyber") {
+    return (
+      <div className="signup-prompt-cyber">
+        <p>{text}</p>
+        <div className="signup-prompt-cyber-actions">
+          <Link to="/signup" className="signup-prompt-cyber-link is-primary">
+            Create account
+          </Link>
+          <Link to="/login" className="signup-prompt-cyber-link">
+            Log in
+          </Link>
+          {dismissible && (
+            <button
+              type="button"
+              onClick={() => setDismissed(true)}
+              className="signup-prompt-cyber-dismiss"
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-indigo-50 border border-indigo-100 px-4 py-3 mb-6">
-      <p className="text-sm text-indigo-900">
-        {message || "You're playing as a guest. Sign up to save your progress and sync it across devices."}
-      </p>
+      <p className="text-sm text-indigo-900">{text}</p>
       <div className="flex items-center gap-3 shrink-0">
         <Link to="/signup" className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">
           Create account

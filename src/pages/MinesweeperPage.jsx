@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import GameShell from "../components/cyber/GameShell";
+import CyberPageHeader from "../components/cyber/CyberPageHeader";
+import CyberPanel from "../components/cyber/CyberPanel";
+import CyberButton from "../components/cyber/CyberButton";
+import CyberStat, { CyberStatGrid } from "../components/cyber/CyberStat";
 import SignupPrompt from "../components/SignupPrompt";
 import { useGuestSave } from "../hooks/useGuestSave";
 
@@ -168,80 +171,67 @@ export default function MinesweeperPage() {
   };
 
   return (
-    <div className="app-shell min-h-screen">
-      <Navbar />
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <PageHeader
-          title="Minesweeper"
-          subtitle="Clear the board quickly and flag accurately for a better final score."
-        />
+    <GameShell accent="slate" maxWidth="md">
+      <CyberPageHeader
+        title="Minesweeper"
+        subtitle="Clear the board quickly and flag accurately for a better final score."
+        tag="STRATEGY"
+      />
 
-        {isGuest && <SignupPrompt />}
+      {isGuest && <SignupPrompt variant="cyber" />}
 
-        <div className="card-elevated p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <div className="rounded-xl bg-slate-100 p-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">Time</p>
-              <p className="text-lg font-bold text-slate-900">{seconds}s</p>
-            </div>
-            <div className="rounded-xl bg-indigo-50 p-3">
-              <p className="text-xs text-indigo-600 uppercase tracking-wide">Mines left</p>
-              <p className="text-lg font-bold text-indigo-700">{minesLeft}</p>
-            </div>
-            <div className="rounded-xl bg-amber-50 p-3">
-              <p className="text-xs text-amber-600 uppercase tracking-wide">Flags used</p>
-              <p className="text-lg font-bold text-amber-700">{flaggedCount}</p>
-            </div>
-            <div className="rounded-xl bg-emerald-50 p-3">
-              <p className="text-xs text-emerald-600 uppercase tracking-wide">Live score</p>
-              <p className="text-lg font-bold text-emerald-700">{liveScore}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3 items-center justify-between mb-4">
-            <p className="text-slate-600 text-sm">
-              {boom && <span className="text-rose-700 font-semibold">Mine hit.</span>}
-              {won && !boom && <span className="text-emerald-700 font-semibold">Board cleared! Great run.</span>}
-              {!boom && !won && <span>9×9 · {MINES} mines</span>}
-            </p>
-            <button type="button" onClick={reset} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm font-semibold">
-              Reset
-            </button>
-          </div>
-          <div
-            className="grid-minesweeper gap-0.5 bg-slate-600 p-2 rounded-xl select-none"
-            onContextMenu={(e) => e.preventDefault()}
-          >
-            {Array.from({ length: ROWS * COLS }, (_, i) => {
-              const r = Math.floor(i / COLS),
-                c = i % COLS;
-              const rev = phase === "init" ? false : revealed[r][c];
-              const flag = flags[r][c];
-              const mine = phase !== "init" && isMine(r, c);
-              let label = "";
-              if (flag && !rev) label = "🚩";
-              else if (rev && !mine) label = counts[r][c] ? String(counts[r][c]) : "";
-              if (boom && mine) label = "💥";
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  className={`w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm font-bold rounded border border-slate-500 ${
-                    rev
-                      ? mine
-                        ? "bg-rose-600 text-white"
-                        : "bg-slate-100 text-indigo-800"
-                      : "bg-indigo-500 text-white hover:bg-indigo-400"
-                  }`}
-                  onClick={(e) => handleCell(r, c, e)}
-                  onContextMenu={(e) => handleCell(r, c, e)}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+      <CyberPanel>
+        <CyberStatGrid>
+          <CyberStat label="Time" value={`${seconds}s`} delay={0} />
+          <CyberStat label="Mines left" value={minesLeft} delay={50} />
+          <CyberStat label="Flags used" value={flaggedCount} delay={100} />
+          <CyberStat label="Live score" value={liveScore} highlight delay={150} />
+        </CyberStatGrid>
+
+        <div className="cyber-toolbar">
+          <p className="cyber-toolbar-status">
+            {boom && <span className="cyber-msg--error">Mine hit.</span>}
+            {won && !boom && <span className="cyber-msg--success">Board cleared! Great run.</span>}
+            {!boom && !won && <span>9×9 · {MINES} mines · right-click to flag</span>}
+          </p>
+          <CyberButton variant="primary" onClick={reset}>
+            Reset
+          </CyberButton>
         </div>
-      </main>
-    </div>
+
+        <div className="grid-minesweeper select-none" onContextMenu={(e) => e.preventDefault()}>
+          {Array.from({ length: ROWS * COLS }, (_, i) => {
+            const r = Math.floor(i / COLS),
+              c = i % COLS;
+            const rev = phase === "init" ? false : revealed[r][c];
+            const flag = flags[r][c];
+            const mine = phase !== "init" && isMine(r, c);
+            let label = "";
+            if (flag && !rev) label = "🚩";
+            else if (rev && !mine) label = counts[r][c] ? String(counts[r][c]) : "";
+            if (boom && mine) label = "💥";
+
+            let cellClass = "cyber-mine-cell ";
+            if (rev && mine) cellClass += "is-mine";
+            else if (rev) cellClass += "is-revealed";
+            else if (flag) cellClass += "is-hidden is-flagged";
+            else cellClass += "is-hidden";
+
+            return (
+              <button
+                key={i}
+                type="button"
+                className={cellClass}
+                data-n={rev && !mine && counts[r][c] ? counts[r][c] : undefined}
+                onClick={(e) => handleCell(r, c, e)}
+                onContextMenu={(e) => handleCell(r, c, e)}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </CyberPanel>
+    </GameShell>
   );
 }

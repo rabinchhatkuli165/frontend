@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
-import Navbar from "../components/Navbar";
-import PageHeader from "../components/PageHeader";
+import GameShell from "../components/cyber/GameShell";
+import CyberPageHeader from "../components/cyber/CyberPageHeader";
+import CyberPanel from "../components/cyber/CyberPanel";
+import CyberButton from "../components/cyber/CyberButton";
 import SignupPrompt from "../components/SignupPrompt";
 import { useGuestSave } from "../hooks/useGuestSave";
 
@@ -56,66 +58,55 @@ export default function WordSearchPage() {
   };
 
   return (
-    <div className="app-shell min-h-screen">
-      <Navbar />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <PageHeader
-          title="Word Search"
-          subtitle="Words can appear horizontally in any row. Type a word from the list when you spot it."
-        />
+    <GameShell accent="teal" maxWidth="lg">
+      <CyberPageHeader
+        title="Word Search"
+        subtitle="Words can appear horizontally in any row. Type a word from the list when you spot it."
+        tag="WORD"
+      />
 
-        {isGuest && <SignupPrompt />}
+      {isGuest && <SignupPrompt variant="cyber" />}
 
-        <div className="card-elevated p-6 sm:p-8 overflow-x-auto">
-          <div className="inline-grid grid-cols-8 gap-1 bg-gradient-to-br from-teal-600 to-emerald-700 p-3 rounded-2xl shadow-inner">
+      <CyberPanel>
+        <div className="cyber-sudoku-wrap">
+          <div className="cyber-word-grid">
             {grid.flat().map((letter, idx) => (
-              <div
-                key={`${letter}-${idx}`}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/95 flex items-center justify-center font-bold text-slate-800 text-sm sm:text-base shadow"
-              >
+              <div key={`${letter}-${idx}`} className="cyber-word-cell">
                 {letter}
               </div>
             ))}
           </div>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {words.map((word) => (
-              <span
-                key={word}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                  found.includes(word) ? "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200" : "bg-slate-100 text-slate-700"
-                }`}
-              >
-                {word}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <input
-              className="input-field flex-1"
-              placeholder="Type a found word"
-              value={entry}
-              onChange={(e) => setEntry(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && checkWord()}
-            />
-            <button
-              type="button"
-              className="rounded-xl bg-slate-900 text-white px-6 py-3 font-semibold hover:bg-slate-800 transition sm:w-auto w-full"
-              onClick={checkWord}
-            >
-              Submit
-            </button>
-          </div>
-
-          {message && <p className="mt-4 text-sm text-slate-600">{message}</p>}
-          {completed && (
-            <p className="mt-3 text-emerald-700 font-semibold flex items-center gap-2">
-              <span aria-hidden>✓</span> All words found. Nice work!
-            </p>
-          )}
         </div>
-      </main>
-    </div>
+
+        <div className="cyber-word-tags">
+          {words.map((word) => (
+            <span
+              key={word}
+              className={`cyber-word-tag${found.includes(word) ? " is-found" : ""}`}
+            >
+              {word}
+            </span>
+          ))}
+        </div>
+
+        <div className="cyber-word-form">
+          <input
+            className="cyber-input"
+            placeholder="Type a found word"
+            value={entry}
+            onChange={(e) => setEntry(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && checkWord()}
+          />
+          <CyberButton variant="primary" onClick={checkWord}>
+            Submit
+          </CyberButton>
+        </div>
+
+        {message && <p className="cyber-msg">{message}</p>}
+        {completed && (
+          <p className="cyber-msg cyber-msg--success">✓ All words found. Nice work!</p>
+        )}
+      </CyberPanel>
+    </GameShell>
   );
 }
