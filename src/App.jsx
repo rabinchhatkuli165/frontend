@@ -9,7 +9,7 @@ import WordSearchPage from "./pages/WordSearchPage";
 import Game2048Page from "./pages/Game2048Page";
 import MinesweeperPage from "./pages/MinesweeperPage";
 import ReactionTimePage from "./pages/ReactionTimePage";
-import SnakePage from "./pages/SnakePage";
+import SnakePage from "./pages/Snakepage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
